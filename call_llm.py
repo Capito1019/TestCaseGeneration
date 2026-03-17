@@ -1,12 +1,25 @@
 import requests
 import json
 import time
+import doc_processor.config as config
 
 # ============================================================
 # 配置区域：请根据“浙大AI接口”提供的实际地址和密钥进行填写
 # ============================================================
-API_URL = "" 
-API_KEY = ""
+
+# 获取基础地址并去掉末尾斜杠
+_raw_url = config.BASE_URL.split('#')[0].rstrip('/') 
+
+# 自动补全 OpenAI 标准的对话路径
+if not _raw_url.endswith("/v1/chat/completions"):
+    if "/v1" in _raw_url:
+        API_URL = f"{_raw_url}/chat/completions"
+    else:
+        API_URL = f"{_raw_url}/v1/chat/completions"
+else:
+    API_URL = _raw_url
+API_KEY = config.API_KEY
+API_MODEL = config.MODEL
 
 def get_llm_response(sysPrompt: str, userPrompt: str, max_retries=3) -> str:
     """
@@ -22,7 +35,7 @@ def get_llm_response(sysPrompt: str, userPrompt: str, max_retries=3) -> str:
 
     # 构建请求体
     data = {
-        "model": "gpt-4o-mini",
+        "model": API_MODEL,
         "messages": [
             {"role": "system", "content": sysPrompt},
             {"role": "user", "content": userPrompt}
@@ -50,7 +63,7 @@ def get_llm_response(sysPrompt: str, userPrompt: str, max_retries=3) -> str:
             if "choices" in result and len(result["choices"]) > 0:
                 return result["choices"][0]["message"]["content"]
             else:
-                return "ERROR: API 返回数据格式异常，未能找到 choices 字段。"
+                return f"ERROR: API 返回异常。原始数据: {json.dumps(result, ensure_ascii=False)}"
 
         except (requests.exceptions.Timeout, requests.exceptions.ConnectionError) as e:
             # 捕获超时或连接错误

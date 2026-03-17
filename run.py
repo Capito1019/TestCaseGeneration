@@ -95,7 +95,7 @@ def main():
     manage_knowledge_base(rag_engine)
     
     # 将已管理好的 rag 引擎传入生成器
-    max_rounds = args.max_rounds if args.max_rounds is not None else 3
+    max_rounds = int(args.max_rounds) if args.max_rounds else 3
     generator = TestGenerator(max_rounds= max_rounds)
     generator.rag = rag_engine 
 

@@ -88,17 +88,15 @@ class RequirementProcessor:
         # 2. 构造 Markdown 内容
         md_content = [
             f"# 测试用例生成报告 - {entry.sr_id}\n",
-            "## 1. 需求追溯上下文",
-            f"- **用户需求ID**: `{entry.ur_id}`",
-            f"- **软件需求ID**: `{entry.sr_id}`",
-            f"- **需求类型**: {entry.sr_type}",
-            "\n### 原始软件子需求细节",
-            f"> {entry.sr_sub_content}\n",
+            "## 1. 需求背景",
+            f"- **软件需求**: {entry.sr_content}",
+            f"- **细节描述**: {entry.sr_sub_content}\n",
             "---\n",
-            "## 2. 生成的测试用例内容\n",
-            final_case,  # 直接注入大模型输出的内容
+            "## 2. 详细测试用例内容",
+            "> 提示：以下内容由系统根据拆解的测试分支自动汇总生成。\n",
+            final_case, # 此时 final_case 内部已包含 # 测试用例报告 1 等标题
             "\n---\n",
-            f"> *生成日期: 2026-01-28*"
+            f"> *生成日期: {pd.Timestamp.now().strftime('%Y-%m-%d %H:%M:%S')}*"
         ]
 
         # 3. 写入文件
